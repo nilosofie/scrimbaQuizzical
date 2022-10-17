@@ -9,12 +9,16 @@ function App() {
   const [intro, setIntro] = React.useState(true);
 
   function handleIntro() {
-    setIntro(false);
+    setIntro((old) => !old);
   }
 
   return (
     <div className="App">
-      {intro ? <Intro handleIntro={() => handleIntro()} /> : <Main />}
+      {intro ? (
+        <Intro handleIntro={() => handleIntro()} />
+      ) : (
+        <Main handleIntro={() => handleIntro()} />
+      )}
     </div>
   );
 }
