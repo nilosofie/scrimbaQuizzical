@@ -1,29 +1,46 @@
 import React from 'react';
 import Question from './Question';
+import { nanoid } from 'nanoid';
+import quizData from '../data';
 
 export default function Main(props) {
-  const [questions, setQuestions] = React.useState(fetchQuestions());
+  const [quizState, setQuizState] = React.useState();
 
-  function fetchQuestions() {
-    const arrNewArr = [];
-    for (let i = 0; i < 5; i++) {
-      arrNewArr.push({
-        question: `Question: ${i}`,
-        options: [1, 2, 3, 4, 5],
-      });
-    }
-    return arrNewArr;
-  }
+  const getApiQuiz = async () => {
+    const response = await fetch('https://opentdb.com/api.php?amount=5').then(
+      (response) => response.json()
+    );
 
-  const questionElements = questions.map((question) => (
-    <Question question={question.question} options={question.options} />
-  ));
+    setQuizState(response);
+  };
+
+  React.useEffect(() => {
+    getApiQuiz();
+    // console.log(quizData);
+    // setQuizState(quizData);
+  }, []);
+
+  const questionElements = quizState ? (
+    quizState.results.map((questionSet) => (
+      <Question
+        question={questionSet.question}
+        correct={questionSet.correct_answer}
+        incorrect={questionSet.incorrect_answers}
+        key={nanoid()}
+      />
+    ))
+  ) : (
+    <h3>Loading...</h3>
+  );
 
   return (
-    <div>
-      {questionElements}
+    <div className="main-div">
+      {/* <pre>{JSON.stringify(quizState.results, null, 2)}</pre> */}
+      <div>{questionElements}</div>
 
-      <button onClick={props.handleIntro}>Check Awnsers</button>
+      <button onClick={props.handleIntro} className="btn">
+        Check Awnsers
+      </button>
     </div>
   );
 }
