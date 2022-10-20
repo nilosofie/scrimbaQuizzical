@@ -27,13 +27,14 @@ export default function Main(props) {
             correct={questionSet.correct_answer}
             incorrect={questionSet.incorrect_answers}
             key={nanoid()}
+            markState={markState}
           />
         ))
       ) : (
         <h3>Loading...</h3>
       )
     );
-  }, [quizState]);
+  }, [markState, quizState]);
 
   //Functions-------------------------------------------------------------------------------------------------
 

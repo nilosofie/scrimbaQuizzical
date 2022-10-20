@@ -5,9 +5,11 @@ import { nanoid } from 'nanoid';
 //Component=============================================================================
 
 function Answer(props) {
-  const styles = props.selected
-    ? 'answer-div selected'
-    : 'answer-div unselected';
+  const selectStyle = props.selected ? 'selected' : 'unselected';
+
+  const markStyle = props.markState ? 'marked' : 'unmarked';
+
+  const styles = `answer-div ${selectStyle} ${markStyle}`;
 
   return (
     <div className={styles} onClick={props.selectAns}>
@@ -20,10 +22,39 @@ function Answer(props) {
 
 export default function Question(props) {
   //Sate------------------------------------------------------------
-  const [arrAns, setArrAns] = React.useState(scramble);
+  const [arrAns, setArrAns] = React.useState();
 
   //UseEffect-----------------------------------------------------------
+  React.useEffect(() => {
+    const arrScram = [
+      {
+        value: props.correct,
+        mark: true,
+        selected: false,
+        id: nanoid(),
+      },
+    ];
 
+    for (let i = 0; i < props.incorrect.length; i++) {
+      arrScram.push({
+        value: props.incorrect[i],
+        mark: false,
+        selected: false,
+        id: nanoid(),
+      });
+    }
+    setArrAns(shuffle(arrScram));
+  }, [props.Question]);
+
+  // React.useEffect(() => {
+  //   const newArr = [];
+  //   for (let i = 0; i < arrAns.length; i++) {
+  //     newArr.push({
+  //       ...arrAns[i],
+
+  //     })
+  //   }
+  // }, [props.markState]);
   //Functions------------------------------------------------------------
 
   function shuffle(array) {
@@ -47,26 +78,26 @@ export default function Question(props) {
 
   //-----------------------------------------------------------------------------
 
-  function scramble() {
-    const arrScram = [
-      {
-        value: props.correct,
-        mark: true,
-        selected: false,
-        id: nanoid(),
-      },
-    ];
+  // function createAns() {
+  //   const arrScram = [
+  //     {
+  //       value: props.correct,
+  //       mark: true,
+  //       selected: false,
+  //       id: nanoid(),
+  //     },
+  //   ];
 
-    for (let i = 0; i < props.incorrect.length; i++) {
-      arrScram.push({
-        value: props.incorrect[i],
-        mark: false,
-        selected: false,
-        id: nanoid(),
-      });
-    }
-    return shuffle(arrScram);
-  }
+  //   for (let i = 0; i < props.incorrect.length; i++) {
+  //     arrScram.push({
+  //       value: props.incorrect[i],
+  //       mark: false,
+  //       selected: false,
+  //       id: nanoid(),
+  //     });
+  //   }
+  //   return shuffle(arrScram);
+  // }
 
   //Handler----------------------------------------------------------------------------------
 
@@ -82,15 +113,21 @@ export default function Question(props) {
 
   //Elements----------------------------------------------------------------------------------
 
-  const answerElements = arrAns.map((answer) => (
-    <Answer
-      value={answer.value}
-      mark={answer.mark}
-      selected={answer.selected}
-      key={answer.id}
-      selectAns={() => handleSelect(answer.id)}
-    />
-  ));
+  const answerElements = arrAns ? (
+    arrAns.map((answer) => (
+      <Answer
+        value={answer.value}
+        mark={answer.mark}
+        selected={answer.selected}
+        key={answer.id}
+        selectAns={() => handleSelect(answer.id)}
+        markState={props.markState}
+      />
+    ))
+  ) : (
+    <p>Loading...</p>
+  );
+
   //Render--------------------------------------------------------------------------
   return (
     <div className="question-div">

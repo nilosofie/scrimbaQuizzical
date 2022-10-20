@@ -83,3 +83,7 @@ body {
   border: none;
   background-color: #d6dbf5;
 }
+
+.marked {
+  color: red;
+}
