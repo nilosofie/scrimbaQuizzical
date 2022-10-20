@@ -1,19 +1,24 @@
 import React from 'react';
-import { nanoid } from 'nanoid';
-// import Answer from './Answer';
 
 //Component=============================================================================
 
 function Answer(props) {
-  const selectStyle = props.selected ? 'selected' : 'unselected';
+  const correct = props.stateSet.selected && props.stateSet.correct;
 
-  const markStyle = props.markState ? 'marked' : 'unmarked';
+  const selectStyle = props.stateSet.selected ? 'selected' : 'unselected';
+
+  let markStyle = '';
+
+  if (props.markState) {
+    markStyle = correct ? 'correct' : 'incorrect';
+  }
 
   const styles = `answer-div ${selectStyle} ${markStyle}`;
 
   return (
-    <div className={styles} onClick={props.selectAns}>
-      {props.value}
+    <div className={styles} onClick={!props.markState && props.selectAns}>
+      {/* {<pre>{JSON.stringify(props.stateSet, null, 2)}</pre>} */}
+      <div dangerouslySetInnerHTML={{ __html: props.stateSet.value }} />
     </div>
   );
 }
@@ -21,104 +26,30 @@ function Answer(props) {
 //Component==============================================================================
 
 export default function Question(props) {
-  //Sate------------------------------------------------------------
-  const [arrAns, setArrAns] = React.useState();
-
-  //UseEffect-----------------------------------------------------------
-  React.useEffect(() => {
-    const arrScram = [
-      {
-        value: props.correct,
-        mark: true,
-        selected: false,
-        id: nanoid(),
-      },
-    ];
-
-    for (let i = 0; i < props.incorrect.length; i++) {
-      arrScram.push({
-        value: props.incorrect[i],
-        mark: false,
-        selected: false,
-        id: nanoid(),
-      });
-    }
-    setArrAns(shuffle(arrScram));
-  }, [props.Question]);
-
-  // React.useEffect(() => {
-  //   const newArr = [];
-  //   for (let i = 0; i < arrAns.length; i++) {
-  //     newArr.push({
-  //       ...arrAns[i],
-
-  //     })
-  //   }
-  // }, [props.markState]);
-  //Functions------------------------------------------------------------
-
-  function shuffle(array) {
-    let currentIndex = array.length,
-      randomIndex;
-
-    // While there remain elements to shuffle.
-    while (currentIndex !== 0) {
-      // Pick a remaining element.
-      randomIndex = Math.floor(Math.random() * currentIndex);
-      currentIndex--;
-
-      // And swap it with the current element.
-      [array[currentIndex], array[randomIndex]] = [
-        array[randomIndex],
-        array[currentIndex],
-      ];
-    }
-    return array;
-  }
-
-  //-----------------------------------------------------------------------------
-
-  // function createAns() {
-  //   const arrScram = [
-  //     {
-  //       value: props.correct,
-  //       mark: true,
-  //       selected: false,
-  //       id: nanoid(),
-  //     },
-  //   ];
-
-  //   for (let i = 0; i < props.incorrect.length; i++) {
-  //     arrScram.push({
-  //       value: props.incorrect[i],
-  //       mark: false,
-  //       selected: false,
-  //       id: nanoid(),
-  //     });
-  //   }
-  //   return shuffle(arrScram);
-  // }
-
   //Handler----------------------------------------------------------------------------------
 
   function handleSelect(id) {
-    setArrAns((oldArr) =>
-      oldArr.map((ans) => {
-        return ans.id === id
-          ? { ...ans, selected: true }
-          : { ...ans, selected: false };
-      })
-    );
+    let locCorrect = false;
+    const instance = props.stateSet.ansArr.map((ans) => {
+      if (ans.id === id && ans.correct) locCorrect = true;
+      return ans.id === id
+        ? { ...ans, selected: true }
+        : { ...ans, selected: false };
+    });
+
+    props.handleAnsSelect({
+      qId: props.stateSet.id,
+      arrAns: instance,
+      correct: locCorrect,
+    });
   }
 
   //Elements----------------------------------------------------------------------------------
 
-  const answerElements = arrAns ? (
-    arrAns.map((answer) => (
+  const answerElements = props.stateSet.ansArr ? (
+    props.stateSet.ansArr.map((answer) => (
       <Answer
-        value={answer.value}
-        mark={answer.mark}
-        selected={answer.selected}
+        stateSet={answer}
         key={answer.id}
         selectAns={() => handleSelect(answer.id)}
         markState={props.markState}
@@ -131,7 +62,8 @@ export default function Question(props) {
   //Render--------------------------------------------------------------------------
   return (
     <div className="question-div">
-      <h3>{props.question}</h3>
+      {/* {<pre>{JSON.stringify(props.stateSet, null, 2)}</pre>} */}
+      <div dangerouslySetInnerHTML={{ __html: props.stateSet.question }} />
       <div className="question-element">{answerElements}</div>
     </div>
   );

@@ -84,6 +84,14 @@ body {
   background-color: #d6dbf5;
 }
 
-.marked {
+.correct {
+  color: green;
+}
+
+.incorrect {
   color: red;
+}
+
+.score {
+  color: #293264;
 }
