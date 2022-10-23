@@ -23,7 +23,7 @@ export default function Main(props) {
 
   const getApiQuiz = async () => {
     const response = await fetch(
-      'https://opentdb.com/api.php?amount=10&category=12'
+      'https://opentdb.com/api.php?amount=10&category=22'
     ).then((response) => response.json());
 
     apiToState(response);
